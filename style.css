@@ -1,0 +1,96 @@
+/* ELEMENTS */
+
+body {
+    margin: 0;
+    padding: 0;
+    background: url(calculator-background.jpg) no-repeat center center fixed;
+    background-size: cover;
+    height: 100%;
+    overflow: hidden;
+}
+
+button {
+    border: thin solid black;
+    border-radius: 5px;
+}
+
+h1 {
+    margin: 0;
+    margin-top: 5px;
+}
+
+
+
+/* IDS */
+
+#calculator {
+    height: 440px;
+    width: 20%;
+    background-color: teal;
+    margin: 350px auto 10%;
+    border: thin solid black;
+    border-radius: 5px;
+    box-shadow: 3px 3px 5px 6px rgb(85, 85, 85);
+}
+
+/* CLASSES */
+
+.display {
+    display: inline-block;
+    position: relative;
+    box-sizing: border-box;  
+    height: 25%;
+    width: 90%;
+    background-color: whitesmoke;
+    margin: 5%;
+    padding: 5%;
+    border: thin solid black;
+    border-radius: 5px;
+}
+
+.clearAndDelete {
+    padding: 0 5%;
+    display: flex;
+    justify-content: space-between;
+}
+
+.clear {
+    background-color: rgb(238, 92, 92);
+}
+
+.delete {
+    background-color: rgb(80, 80, 238);
+}
+
+.numbersAndOperations {
+    display: grid;
+    gap: 3%;
+    padding: 5%;
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(4, minmax(50px, 1fr));
+}
+
+.firstLine {
+    position: absolute;
+    right: 15px;
+    bottom: 15px;
+    font-size: 40px;
+}
+
+.secondLine {
+    position: absolute;
+    right: 15px;
+    bottom: 70px;
+    font-size: 20px;
+}
+
+/* LOCATORS */
+
+.clearAndDelete button {
+    height: 50px;
+    width: 48%;
+}
+
+
+
+
