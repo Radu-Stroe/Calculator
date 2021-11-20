@@ -1,3 +1,5 @@
+//VARIABLES
+
 let firstLineNumber = undefined;
 let secondLineNumber = undefined;
 let answer = undefined;
@@ -12,12 +14,12 @@ const equal = document.querySelector('button.equal');
 const firstLine = document.querySelector('div.firstLine');
 const secondLine = document.querySelector('div.secondLine');
 const clearButton = document.querySelector('button.clear');
-
+const deleteButton = document.querySelector('button.delete');
 
 
 //EVENTS
 numbers.forEach(number => number.addEventListener('click', function(e) {
-    displayFirstLine(e.target.textContent);
+    displayLine(e.target.textContent);
 }));
 
 operations.forEach(operation => operation.addEventListener('click', function(e) {
@@ -30,7 +32,6 @@ operations.forEach(operation => operation.addEventListener('click', function(e) 
         secondLine.textContent = firstLineNumber + ' ' + operationType;
         operationUsed = true;
     } else if(operationUsed) {
-        // secondLine.textContent += (' ' + secondLineNumber + ' =');
         console.log(operationType);
         switch(operationType) {
             case '+':
@@ -47,6 +48,9 @@ operations.forEach(operation => operation.addEventListener('click', function(e) 
                 break;
         }
         operationType = e.target.textContent;
+        if(isFloat(answer)){
+            answer = Number(answer.toFixed(4));
+        }
         firstLine.textContent = answer;
         firstLineNumber = answer;
         secondLine.textContent = answer + ' ' + operationType;
@@ -64,27 +68,33 @@ clearButton.addEventListener('click', function() {
     secondLineNumber = undefined;
     firstLine.textContent = 0;
     secondLine.textContent = '';
+    operationUsed = false;
 })
+
+deleteButton.addEventListener('click', function() {
+
+});
 
 
 //FUNCTIONS
 
-function displayFirstLine(content) {
+function displayLine(content) {
     if ((!secondLineNumber) && operationUsed) {
         secondLineNumber = Number(content);
         firstLine.textContent = secondLineNumber;
-    } else if (operationUsed) {
+    } else if (operationUsed && (secondLineNumber > 0.0001 || secondLineNumber < 10000)) {
         secondLineNumber = Number(firstLine.textContent + content);
         firstLine.textContent = secondLineNumber;
     } else if (!firstLineNumber) {
         firstLineNumber = Number(content);
         firstLine.textContent = firstLineNumber;
-    } else  {
+    } else if(firstLineNumber > 0.0001 || firstLineNumber < 10000)  {
         firstLineNumber = Number(firstLineNumber.toString() + content);
         firstLine.textContent = firstLineNumber;
     }
     console.log("first value: " + firstLineNumber);
     console.log("second value: " + secondLineNumber);
+    console.log("flag: " + operationUsed);
 }
 
 function calculateAnswer() {
@@ -104,6 +114,9 @@ function calculateAnswer() {
         case '÷':
             answer = divide(firstLineNumber, secondLineNumber);
             break;
+    }
+    if(isFloat(answer)){
+        answer = Number(answer.toFixed(4));
     }
     firstLine.textContent = answer;
     firstLineNumber = answer;
@@ -131,6 +144,10 @@ function divide(a, b) {
 function operate(operateFunction, a, b) {
     operateFunction(a, b);
 }
+
+function isFloat(n){
+    return Number(n) === n && n % 1 !== 0;
+  }
 
 
 
