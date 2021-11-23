@@ -1,10 +1,11 @@
 //VARIABLES
 
-let firstLineNumber = undefined;
+let firstLineNumber = '0';
 let secondLineNumber = undefined;
 let answer = undefined;
 let operationUsed = false;
 let operationType = undefined;
+let floatFlag = false;
 
 //ELEMENTS
 
@@ -15,6 +16,7 @@ const firstLine = document.querySelector('div.firstLine');
 const secondLine = document.querySelector('div.secondLine');
 const clearButton = document.querySelector('button.clear');
 const deleteButton = document.querySelector('button.delete');
+const floatButton = document.querySelector('button.float');
 
 
 //EVENTS
@@ -24,7 +26,18 @@ numbers.forEach(number => number.addEventListener('click', function(e) {
 
 operations.forEach(operation => operation.addEventListener('click', function(e) {
     
-    if(!secondLineNumber && operationUsed) {
+    if(operationType === '÷' && secondLineNumber === '0') {
+        secondLine.textContent = '';
+        firstLine.textContent = 'Undefined';
+        setTimeout(() => {
+            firstLineNumber = '0';
+            secondLineNumber = undefined;
+            firstLine.textContent = '0';
+            secondLine.textContent = '';
+            operationUsed = false;
+            floatFlag = false;
+        }, 2000);
+    } else if(!secondLineNumber && operationUsed) {
         operationType = e.target.textContent;
         secondLine.textContent = answer + ' ' + operationType;
     } else if(!operationUsed) {
@@ -57,6 +70,7 @@ operations.forEach(operation => operation.addEventListener('click', function(e) 
         secondLineNumber = undefined;
         console.log(secondLineNumber);
     }
+    floatFlag = false;
 }));
 
 equal.addEventListener('click', function() {
@@ -64,32 +78,53 @@ equal.addEventListener('click', function() {
 });
 
 clearButton.addEventListener('click', function() {
-    firstLineNumber = undefined;
+    firstLineNumber = '0';
     secondLineNumber = undefined;
-    firstLine.textContent = 0;
+    firstLine.textContent = '0';
     secondLine.textContent = '';
     operationUsed = false;
+    floatFlag = false;
 })
 
 deleteButton.addEventListener('click', function() {
+    if(firstLine.textContent.length > 1) {
+        firstLine.textContent = firstLine.textContent.substring(0, firstLine.textContent.length - 1);
+        firstLineNumber = Number(firstLine.textContent);
+    } else {
+        firstLine.textContent = 0;
+        firstLineNumber = 0;
+    }
+});
 
+floatButton.addEventListener('click', function() {
+    if(!floatFlag) {
+        firstLine.textContent += '.';
+        floatFlag = true;
+    }
 });
 
 
 //FUNCTIONS
 
 function displayLine(content) {
-    if ((!secondLineNumber) && operationUsed) {
-        secondLineNumber = Number(content);
+    console.log('test');
+    if ((secondLineNumber === undefined) && operationUsed) {
+        secondLineNumber = content;
         firstLine.textContent = secondLineNumber;
-    } else if (operationUsed && (secondLineNumber > 0.0001 || secondLineNumber < 10000)) {
-        secondLineNumber = Number(firstLine.textContent + content);
+    } else if (!isFloat(Number(secondLineNumber)) && operationUsed && (secondLineNumber.length < 5) && firstLine.textContent.includes('.')) {
+        secondLineNumber = firstLine.textContent + content;
         firstLine.textContent = secondLineNumber;
-    } else if (!firstLineNumber) {
-        firstLineNumber = Number(content);
+    } else if (operationUsed && (secondLineNumber.length < 5)) {
+        secondLineNumber = firstLine.textContent + content;
+        firstLine.textContent = secondLineNumber;
+    } else if (!isFloat(Number(firstLineNumber)) &&  Number(firstLineNumber) < 10 && firstLine.textContent.includes('.')) {
+        firstLineNumber = firstLine.textContent + content;
         firstLine.textContent = firstLineNumber;
-    } else if(firstLineNumber > 0.0001 || firstLineNumber < 10000)  {
-        firstLineNumber = Number(firstLineNumber.toString() + content);
+    } else if (firstLineNumber === '0') {
+        firstLineNumber = content;
+        firstLine.textContent = firstLineNumber;
+    } else if(firstLine.textContent.length < 5)  {
+        firstLineNumber = firstLineNumber + content;
         firstLine.textContent = firstLineNumber;
     }
     console.log("first value: " + firstLineNumber);
@@ -98,7 +133,8 @@ function displayLine(content) {
 }
 
 function calculateAnswer() {
-    console.log(firstLineNumber);
+    if(firstLineNumber && secondLineNumber) {
+        console.log(firstLineNumber);
     secondLineNumber = Number(firstLine.textContent);
     secondLine.textContent += (' ' + secondLineNumber + ' =');
     switch(operationType) {
@@ -123,22 +159,23 @@ function calculateAnswer() {
     secondLineNumber = undefined;
     operationUsed = false;
     console.log(secondLineNumber);
+    }
 }
 
 function add(a, b) {
-    return a + b;
+    return Number(a) + Number(b);
 }
 
 function subtract(a, b) {
-    return a - b;
+    return Number(a) - Number(b);
 }
 
 function multiply(a, b) {
-    return a * b;
+    return Number(a) * Number(b);
 }
 
 function divide(a, b) {
-    return a / b;
+    return Number(a) / Number(b);
 }
 
 function operate(operateFunction, a, b) {
