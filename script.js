@@ -19,58 +19,13 @@ const deleteButton = document.querySelector('button.delete');
 const floatButton = document.querySelector('button.float');
 
 
-//EVENTS
+//CLICK EVENTS
 numbers.forEach(number => number.addEventListener('click', function(e) {
     displayLine(e.target.textContent);
 }));
 
 operations.forEach(operation => operation.addEventListener('click', function(e) {
-    
-    if(operationType === '÷' && secondLineNumber === '0') {
-        secondLine.textContent = '';
-        firstLine.textContent = 'Undefined';
-        setTimeout(() => {
-            firstLineNumber = '0';
-            secondLineNumber = undefined;
-            firstLine.textContent = '0';
-            secondLine.textContent = '';
-            operationUsed = false;
-            floatFlag = false;
-        }, 2000);
-    } else if(!secondLineNumber && operationUsed) {
-        operationType = e.target.textContent;
-        secondLine.textContent = answer + ' ' + operationType;
-    } else if(!operationUsed) {
-        operationType = e.target.textContent;
-        secondLine.textContent = firstLineNumber + ' ' + operationType;
-        operationUsed = true;
-    } else if(operationUsed) {
-        console.log(operationType);
-        switch(operationType) {
-            case '+':
-                answer = add(firstLineNumber, secondLineNumber);
-                break;
-            case '-':
-                answer = subtract(firstLineNumber, secondLineNumber);
-                break;
-            case 'x':
-                answer = multiply(firstLineNumber, secondLineNumber);
-                break;
-            case '÷':
-                answer = divide(firstLineNumber, secondLineNumber);
-                break;
-        }
-        operationType = e.target.textContent;
-        if(isFloat(answer)){
-            answer = Number(answer.toFixed(4));
-        }
-        firstLine.textContent = answer;
-        firstLineNumber = answer;
-        secondLine.textContent = answer + ' ' + operationType;
-        secondLineNumber = undefined;
-        console.log(secondLineNumber);
-    }
-    floatFlag = false;
+    calculateOperation(e.target.textContent);
 }));
 
 equal.addEventListener('click', function() {
@@ -78,31 +33,40 @@ equal.addEventListener('click', function() {
 });
 
 clearButton.addEventListener('click', function() {
-    firstLineNumber = '0';
-    secondLineNumber = undefined;
-    firstLine.textContent = '0';
-    secondLine.textContent = '';
-    operationUsed = false;
-    floatFlag = false;
+    resetCalculator();
 })
 
 deleteButton.addEventListener('click', function() {
-    if(firstLine.textContent.length > 1) {
-        firstLine.textContent = firstLine.textContent.substring(0, firstLine.textContent.length - 1);
-        firstLineNumber = Number(firstLine.textContent);
-    } else {
-        firstLine.textContent = 0;
-        firstLineNumber = 0;
-    }
+    deleteChar();
 });
 
 floatButton.addEventListener('click', function() {
-    if(!floatFlag) {
-        firstLine.textContent += '.';
-        floatFlag = true;
-    }
+    useFloatChar();
 });
 
+
+//KEYDOWN EVENTS
+
+document.addEventListener('keydown', function(e) {
+    switch(e.key) {
+        case '0': case '1': case '2': case '3': case '4': case '5': case '6': case '7': case '8': case '9':
+            displayLine(e.key);
+            break;
+        case '+': case '-': case '*': case '/': 
+            calculateOperation(e.key);
+            break;
+        case '=':
+            calculateAnswer();
+            break;
+        case '.':
+            useFloatChar();
+            break;
+        case 'Backspace':
+            deleteChar();
+            break;
+        default:
+    }
+});
 
 //FUNCTIONS
 
@@ -132,6 +96,54 @@ function displayLine(content) {
     console.log("flag: " + operationUsed);
 }
 
+function calculateOperation(key) {
+    if((operationType === '÷' || operationType === '/') && secondLineNumber === '0') {
+        secondLine.textContent = '';
+        firstLine.textContent = 'Undefined';
+        setTimeout(() => {
+            firstLineNumber = '0';
+            secondLineNumber = undefined;
+            firstLine.textContent = '0';
+            secondLine.textContent = '';
+            operationUsed = false;
+            floatFlag = false;
+        }, 2000);
+    } else if(!secondLineNumber && operationUsed) {
+        operationType = key;
+        secondLine.textContent = answer + ' ' + operationType;
+    } else if(!operationUsed) {
+        operationType = key;
+        secondLine.textContent = firstLineNumber + ' ' + operationType;
+        operationUsed = true;
+    } else if(operationUsed) {
+        console.log(operationType);
+        switch(operationType) {
+            case '+':
+                answer = add(firstLineNumber, secondLineNumber);
+                break;
+            case '-':
+                answer = subtract(firstLineNumber, secondLineNumber);
+                break;
+            case 'x': case '*': 
+                answer = multiply(firstLineNumber, secondLineNumber);
+                break;
+            case '÷': case '/': 
+                answer = divide(firstLineNumber, secondLineNumber);
+                break;
+        }
+        operationType = key;
+        if(isFloat(answer)){
+            answer = Number(answer.toFixed(4));
+        }
+        firstLine.textContent = answer;
+        firstLineNumber = answer;
+        secondLine.textContent = answer + ' ' + operationType;
+        secondLineNumber = undefined;
+        console.log(secondLineNumber);
+    }
+    floatFlag = false;
+}
+
 function calculateAnswer() {
     if(firstLineNumber && secondLineNumber) {
         console.log(firstLineNumber);
@@ -144,10 +156,10 @@ function calculateAnswer() {
         case '-':
             answer = subtract(firstLineNumber, secondLineNumber);
             break;
-        case 'x':
+        case 'x': case '*':
             answer = multiply(firstLineNumber, secondLineNumber);
             break;
-        case '÷':
+        case '÷': case '/':
             answer = divide(firstLineNumber, secondLineNumber);
             break;
     }
@@ -160,6 +172,32 @@ function calculateAnswer() {
     operationUsed = false;
     console.log(secondLineNumber);
     }
+}
+
+function useFloatChar() {
+    if(!floatFlag) {
+        firstLine.textContent += '.';
+        floatFlag = true;
+    }
+}
+
+function deleteChar() {
+    if(firstLine.textContent.length > 1) {
+        firstLine.textContent = firstLine.textContent.substring(0, firstLine.textContent.length - 1);
+        firstLineNumber = Number(firstLine.textContent);
+    } else {
+        firstLine.textContent = 0;
+        firstLineNumber = 0;
+    }
+}
+
+function resetCalculator() {
+    firstLineNumber = '0';
+    secondLineNumber = undefined;
+    firstLine.textContent = '0';
+    secondLine.textContent = '';
+    operationUsed = false;
+    floatFlag = false;
 }
 
 function add(a, b) {
@@ -176,10 +214,6 @@ function multiply(a, b) {
 
 function divide(a, b) {
     return Number(a) / Number(b);
-}
-
-function operate(operateFunction, a, b) {
-    operateFunction(a, b);
 }
 
 function isFloat(n){
